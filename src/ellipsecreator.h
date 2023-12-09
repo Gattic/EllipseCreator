@@ -39,6 +39,7 @@
 #include <time.h>
 #include <vector>
 
+class Circle;
 class Point2;
 class GLinearLayout;
 class RUImageComponent;
@@ -68,169 +69,38 @@ class NNInfo;
 
 class EllipseCreatorPanel : public GPanel {
 protected:
-  virtual void updateFromQ(const shmea::ServiceData *);
+  virtual void updateFromQ(const shmea::ServiceData*);
   virtual void onStart();
 
   GNet::GServer *serverInstance;
-  glades::NNInfo *formInfo;
-  glades::ImageInput ii;
-  int currentHiddenLayerIndex;
-  unsigned int netCount;
   bool keepGraping;
-  unsigned int trainingRowIndex;
-  unsigned int testingRowIndex;
-  int prevImageFlag;
 
-  int64_t parsePct(const shmea::GType &);
+  int64_t parsePct(const shmea::GType&);
 
   void buildPanel();
-
-  RUGraph *lcGraph;
-  RUImageComponent *outputImage;
-  RUGraph *rocCurveGraph;
-  RUTable *cMatrixTable;
-
-  RULabel *lblSettings;
-
-  RULabel *lblEpochs;
-  RULabel *lblAccuracy;
-
-  RULabel *lblNeuralNet;
-  RUDropdown *ddNeuralNet;
-
-  RULabel *lblNetName;
-  RUTextbox *tbNetName;
-
-  RUButton *btnSave;
-  RUButton *btnDelete;
-
-  RUTabContainer *layerTabs;
-  GLinearLayout *inputOverallLayout;
-  GLinearLayout *hiddenOverallLayout;
-  GLinearLayout *outputOverallLayout;
-
-  RULabel *lblLayerSize;
-
-  RULabel *lblHiddenLayerCount;
-  RUTextbox *tbHiddenLayerCount;
-
-  RULabel *lblEditHiddenLayer;
-  // RULabel* lblIndexToEdit;
-  RUDropdown *ddIndexToEdit;
-
-  RULabel *lblHiddenLayerSize;
-  RUTextbox *tbHiddenLayerSize;
-
-  RULabel *lblLearningRate;
-  RUTextbox *tbLearningRate;
-
-  RULabel *lblWeightDecay1;
-  RUTextbox *tbWeightDecay1;
-
-  RULabel *lblWeightDecay2;
-  RUTextbox *tbWeightDecay2;
-
-  RULabel *lblMomentumFactor;
-  RUTextbox *tbMomentumFactor;
-
-  RULabel *lblPHidden;
-  RUTextbox *tbPHidden;
-
-  RULabel *lblActivationFunctions;
-  RUDropdown *ddActivationFunctions;
-
-  RULabel *lblActivationParam;
-  RUTextbox *tbActivationParam;
-
-  RULabel *lblEditInputLayer;
-
-  RUTextbox *tbBatchSize;
-
-  RULabel *lblinputLR;
-  RUTextbox *tbinputLR;
-
-  RULabel *lblinputWD1;
-  RUTextbox *tbinputWD1;
-
-  RULabel *lblinputWD2;
-  RUTextbox *tbinputWD2;
-
-  RULabel *lblinputMF;
-  RUTextbox *tbinputMF;
-
-  RULabel *lblinputDropout;
-  RUTextbox *tbinputDropout;
-
-  RULabel *lblinputAF;
-  RUDropdown *ddinputAF;
-
-  RULabel *lblinputAP;
-  RUTextbox *tbinputAP;
-
-  RUTabContainer *previewTabs;
-  RUTable *previewTable;
-  GLinearLayout *previewImageLayout;
-  RUImageComponent *previewImage;
-
-  RULabel *lblEditOutputLayer;
-
-  RULabel *lblOutputType;
-  RUDropdown *ddOutputType;
-
-  RULabel *lblOutputLayerSize;
-  RUTextbox *tbOutputLayerSize;
-
-  RUTextbox *tbCopyDestination;
-
-  RUButton *sendButton;
-
-  RUDropdown *ddDatasets;
-  RUDropdown *ddDataType;
-
-  RUCheckbox *chkCrossVal;
-  RULabel *lblttv;
-  RUTextbox *tbTrainPct;
-  RUTextbox *tbTestPct;
-  RUTextbox *tbValidationPct;
+  RUGraph* dotGraph;
+  RULabel* lblmode;
+  bool clickMode;
+  bool pointTypeFlag;
+  Point2* cFocalPoint;
+  Circle* prevCircle;
 
 public:
-  pthread_mutex_t *lcMutex;
-  pthread_mutex_t *rocMutex;
+  static const int MODE_CIRCLES = 0;
+  static const int MODE_ELLIPSES = 1;
 
-  EllipseCreatorPanel(const shmea::GString &, int, int);
-  EllipseCreatorPanel(GNet::GServer *, const shmea::GString &, int, int);
+  static const int TYPE_FOCAL_POINT  = 0;
+  static const int TYPE_RADIUS = 1;
+
+  EllipseCreatorPanel(const shmea::GString&, int, int);
+  EllipseCreatorPanel(GNet::GServer*, const shmea::GString&, int, int);
   virtual ~EllipseCreatorPanel();
 
-  void loadDDNN();
-  void populateIndexToEdit(int = 0);
-  void populateInputLayerForm();
-  void populateHLayerForm();
-  void syncFormVar();
-  void loadNNet(glades::NNInfo *);
-  void PlotLearningCurve(float, float);
-  void PlotROCCurve(float, float);
-  void updateConfMatrixTable(const shmea::GTable &);
+  void clearCircleHelper(const shmea::GString&, int, int);
+  void toggleModeHelper(const shmea::GString&, int, int);
+  void addCircle(const Point2*, double);
 
-  void loadDatasets();
-
-  void clickedSave(const shmea::GString &, int, int);
-  void clickedEditSwitch(const shmea::GString &, int, int);
-  void clickedDSTypeSwitch(int);
-  void clickedRun(const shmea::GString &, int, int);
-  void clickedCopy(const shmea::GString &, int, int);
-  void clickedRemove(const shmea::GString &, int, int);
-  void tbHLLoseFocus();
-  void clickedLoad(const shmea::GString &, int, int);
-  void checkedCV(const shmea::GString &, int, int);
-  void clickedKill(const shmea::GString &, int, int);
-  void clickedContinue(const shmea::GString &, int, int);
-  void clickedDelete(const shmea::GString &, int, int);
-  void clickedPreviewTrain(const shmea::GString &, int, int);
-  void clickedPreviewTest(const shmea::GString &, int, int);
-  void clickedPrevious(const shmea::GString &, int, int);
-  void clickedNext(const shmea::GString &, int, int);
-  void nnSelectorChanged(int);
-  void resetSim();
+  void onMouseDown(const shmea::GString&, int, int);
 };
 
 #endif
