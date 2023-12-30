@@ -40,6 +40,7 @@
 #include <vector>
 
 class Circle;
+class Ellipse;
 class Point2;
 class GLinearLayout;
 class RUImageComponent;
@@ -99,6 +100,7 @@ public:
   void clearCircleHelper(const shmea::GString&, int, int);
   void toggleModeHelper(const shmea::GString&, int, int);
   void addCircle(const Point2*, double);
+  void addEllipse(const Point2*, double);
 
   void onMouseDown(const shmea::GString&, int, int);
 };
