@@ -162,14 +162,13 @@ void EllipseCreatorPanel::buildPanel()
 }
 
 
-//TODO: Add clearCricles to RUGraph
-//TODO: Add toggleMode to RUGraph
-//TODO: Add CIRCLE to RUGraph
-
 void EllipseCreatorPanel::clearCircleHelper(const shmea::GString& label, int x, int y) 
 {
     if (dotGraph)
 	dotGraph->clear(true);
+    
+    circles.clear();
+
 
     if(cFocalPoint)
 	delete cFocalPoint;
@@ -181,20 +180,15 @@ void EllipseCreatorPanel::clearCircleHelper(const shmea::GString& label, int x, 
 void EllipseCreatorPanel::toggleModeHelper(const shmea::GString& label, int eventX, int eventY)
 {
     clickMode = !clickMode;
-    if(cFocalPoint)
-    {
-       delete cFocalPoint;
-    }
-    cFocalPoint = NULL;
 
     std::cout << "Changed click mode" << std::endl;
     if (dotGraph && lblmode) 
     {
 	std::cout << clickMode << std::endl;
-	if(clickMode == EllipseCreatorPanel::MODE_CIRCLES)
+	if(clickMode == MODE_CIRCLES)
 	{
 	    lblmode->setText("Mode: Circles");
-	} else if (clickMode == EllipseCreatorPanel::MODE_ELLIPSES)
+	} else if (clickMode == MODE_ELLIPSES)
 	{
 	    lblmode->setText("Mode: Ellipses");
 	    std::cout << "Change text " <<std::endl;
@@ -215,6 +209,7 @@ void EllipseCreatorPanel::addCircle(const Point2* focalPoint, double radius)
     
     if(newCircle)
 	dotGraph->add("circle", newCircle, newCircleColor);
+    circles.insert(std::pair<int, Circle*>(dotGraph->getGraphSize()-1, newCircle));
 
 }
 
@@ -242,13 +237,14 @@ void EllipseCreatorPanel::onMouseDown(const shmea::GString& label, int eventX, i
 		return;
 	    //Radius
 	    double radius = sqrt(pow(cFocalPoint->getX() - ((double)eventX), 2.0f) + pow(cFocalPoint->getY() - ((double)eventY), 2.0f));
-	    EllipseCreatorPanel::addCircle(new Point2(cFocalPoint->getX(), cFocalPoint->getY()), radius);
+	    EllipseCreatorPanel::addCircle(cFocalPoint, radius);
 
 	    if(cFocalPoint)
 		delete cFocalPoint;
 	    cFocalPoint = NULL;
 
-	} else if (pointTypeFlag == TYPE_FOCAL_POINT) 
+	}
+	else if (pointTypeFlag == TYPE_FOCAL_POINT) 
 	{
 	    //Focal Point
 	    cFocalPoint = new Point2(eventX, eventY);
@@ -257,6 +253,7 @@ void EllipseCreatorPanel::onMouseDown(const shmea::GString& label, int eventX, i
 	pointTypeFlag = !pointTypeFlag;
     } else if(clickMode == MODE_ELLIPSES)
     {
+	printf("%d\n", pointTypeFlag);
 	if (pointTypeFlag == TYPE_RADIUS) 
 	{
 	    if(!cFocalPoint)
@@ -270,34 +267,29 @@ void EllipseCreatorPanel::onMouseDown(const shmea::GString& label, int eventX, i
 	    if(cFocalPoint)
 		delete cFocalPoint;
 	    cFocalPoint = NULL;
+	    //Switch the type of point we are waiting for
+	    pointTypeFlag = !pointTypeFlag;
 
 	} else if (pointTypeFlag == TYPE_FOCAL_POINT) 
 	{
 	    //Focal Point
 	    cFocalPoint = new Point2(eventX, eventY);
 
-/*	    if(dotGraph->getGraphSize() == 0)
+	    if(dotGraph->getGraphSize() == 0)
 	    {
 		    pointTypeFlag = !pointTypeFlag;
 	    } else 
 	    {
 		if(prevCircle)
-		{
 		    prevCircle->setCenter(cFocalPoint);
 
-		    if(cFocalPoint)
-			delete cFocalPoint;
-		    cFocalPoint = NULL;
+		if(cFocalPoint)
+		    delete cFocalPoint;
+		cFocalPoint = NULL;
 
-		    //drawUpdate = true;
-		}
-	    }*/
+	    }
 
 	}
-	pointTypeFlag = !pointTypeFlag;
-	/*if (dotGraph) {
-	dotGraph->onMouseDown(label, eventX, eventY);
-	}*/
     }   
 }
 
@@ -314,6 +306,3 @@ void EllipseCreatorPanel::updateFromQ(const shmea::ServiceData* data)
 void EllipseCreatorPanel::onStart()
 {
 }
-
-//TODO: Add CreateCircle to EllipseCreatorPanel from Nelly RUGraph::onMouseDown
-//dotGraph ->setMouseDownListener(GeneralListener(this, &EllipseCreatorPanel::CreateCircle));

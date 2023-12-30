@@ -86,6 +86,8 @@ protected:
   Point2* cFocalPoint;
   Circle* prevCircle;
 
+  std::map<int, Circle*> circles;
+
 public:
   static const int MODE_CIRCLES = 0;
   static const int MODE_ELLIPSES = 1;
