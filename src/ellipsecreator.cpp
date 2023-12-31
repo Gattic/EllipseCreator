@@ -63,7 +63,7 @@ EllipseCreatorPanel::EllipseCreatorPanel(const shmea::GString &name, int width,
   clickMode = MODE_CIRCLES;
   pointTypeFlag = TYPE_FOCAL_POINT;
   cFocalPoint = NULL;
-  prevCircle = NULL;
+  initEllipse = NULL;
   buildPanel();
 }
 
@@ -76,7 +76,7 @@ EllipseCreatorPanel::EllipseCreatorPanel(GNet::GServer *newInstance,
   clickMode = MODE_CIRCLES;
   pointTypeFlag = TYPE_FOCAL_POINT;
   cFocalPoint = NULL;
-  prevCircle = NULL;
+  initEllipse = NULL;
   buildPanel();
 }
 
@@ -126,8 +126,9 @@ void EllipseCreatorPanel::buildPanel()
 		mainLayout->addSubItem(lblhelp1);
 
 		RULabel* lblhelp2 = new RULabel();
-		lblhelp2->setWidth(width/2);
+		lblhelp2->setWidth(800);
 		lblhelp2->setHeight(40);
+		lblhelp2->setBGColor(newBGColor);
 		lblhelp2->setText("For Ellipse mode, any subsequent clicks add foci.");
 		lblhelp2->setName("lblhelp2");
 		lblhelp2->setFontColor(newTextColor);
@@ -173,7 +174,7 @@ void EllipseCreatorPanel::clearCircleHelper(const shmea::GString& label, int x, 
     if(cFocalPoint)
 	delete cFocalPoint;
     cFocalPoint = NULL;
-    prevCircle = NULL;
+    initEllipse = NULL;
 
 }
 
@@ -181,49 +182,42 @@ void EllipseCreatorPanel::toggleModeHelper(const shmea::GString& label, int even
 {
     clickMode = !clickMode;
 
-    std::cout << "Changed click mode" << std::endl;
     if (dotGraph && lblmode) 
     {
-	std::cout << clickMode << std::endl;
 	if(clickMode == MODE_CIRCLES)
 	{
 	    lblmode->setText("Mode: Circles");
 	} else if (clickMode == MODE_ELLIPSES)
 	{
 	    lblmode->setText("Mode: Ellipses");
-	    std::cout << "Change text " <<std::endl;
 	}
     }
 }
 
 void EllipseCreatorPanel::addCircle(const Point2* focalPoint, double radius) 
 {
-    printf("Circle(%f, %f, %f)\n", focalPoint->getX(), focalPoint->getY(), radius);
 
     SDL_Color newCircleColor = {0x00, 0x00, 0xFF, 0xFF};
     Circle* newCircle = new Circle();
     newCircle->setCenter(focalPoint);
     newCircle->setRadius(radius);
-    prevCircle = newCircle;
 
     
     if(newCircle)
 	dotGraph->add("circle", newCircle, newCircleColor);
     circles.insert(std::pair<int, Circle*>(dotGraph->getGraphSize()-1, newCircle));
 
+    EllipseCreatorPanel::addEllipse(focalPoint, radius);
+
 }
 
 void EllipseCreatorPanel::addEllipse(const Point2* focalPoint, double radius)
 {
-    printf("Ellipse(%f, %f, %f)\n", focalPoint->getX(), focalPoint->getY(), radius);
 
     SDL_Color newEllipseColor = {0x00, 0x00, 0xFF, 0xFF};
-    Ellipse* newEllipse = new Ellipse();
-    newEllipse->setRadius(radius);
-    newEllipse->addFocalPoint(focalPoint);
-
-    if(newEllipse)
-        dotGraph->add("ellipse", newEllipse, newEllipseColor);
+    initEllipse = new Ellipse();
+    initEllipse->addFocalPoint(focalPoint);
+    initEllipse->setRadius(radius);
     
 }
 
@@ -253,7 +247,6 @@ void EllipseCreatorPanel::onMouseDown(const shmea::GString& label, int eventX, i
 	pointTypeFlag = !pointTypeFlag;
     } else if(clickMode == MODE_ELLIPSES)
     {
-	printf("%d\n", pointTypeFlag);
 	if (pointTypeFlag == TYPE_RADIUS) 
 	{
 	    if(!cFocalPoint)
@@ -261,7 +254,7 @@ void EllipseCreatorPanel::onMouseDown(const shmea::GString& label, int eventX, i
 	    //Radius
 	    double radius = sqrt(pow(cFocalPoint->getX() - ((double)eventX), 2.0f) + pow(cFocalPoint->getY() - ((double)eventY), 2.0f));
 	    SDL_Color circleColor = RUColors::DEFAULT_COLOR_LINE;
-	    EllipseCreatorPanel::addEllipse(new Point2(cFocalPoint->getX(), cFocalPoint->getY()), radius);
+	    EllipseCreatorPanel::addCircle(cFocalPoint, radius);
 //	    dotGraph->add("circle", new Point2(cFocalPoint->getX(), cFocalPoint->getY()), circleColor);
 
 	    if(cFocalPoint)
@@ -275,13 +268,15 @@ void EllipseCreatorPanel::onMouseDown(const shmea::GString& label, int eventX, i
 	    //Focal Point
 	    cFocalPoint = new Point2(eventX, eventY);
 
-	    if(dotGraph->getGraphSize() == 0)
-	    {
+	    if(circles.size() == 0)
 		    pointTypeFlag = !pointTypeFlag;
-	    } else 
+	    else 
 	    {
-		if(prevCircle)
-		    prevCircle->setCenter(cFocalPoint);
+		if(initEllipse)
+		{
+		    initEllipse->addFocalPoint(cFocalPoint);
+		    dotGraph->add("ellipse", initEllipse, RUColors::DEFAULT_COLOR_LINE);
+		}
 
 		if(cFocalPoint)
 		    delete cFocalPoint;

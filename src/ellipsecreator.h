@@ -84,7 +84,7 @@ protected:
   bool clickMode;
   bool pointTypeFlag;
   Point2* cFocalPoint;
-  Circle* prevCircle;
+  Ellipse* initEllipse;
 
   std::map<int, Circle*> circles;
 
