@@ -64,13 +64,6 @@ int main(int argc, char *argv[]) {
 
   GNet::GServer *serverInstance = new GNet::GServer();
 
-  // Add services
-  ML_Train *ml_train_srvc = new ML_Train(serverInstance);
-  serverInstance->addService(ml_train_srvc);
-
-  Bayes_Train *bayes_train_srvc = new Bayes_Train(serverInstance);
-  serverInstance->addService(bayes_train_srvc);
-
   // command line args
   bool noguiMode = false;
   bool fullScreenMode = false;
