@@ -14,36 +14,43 @@
 // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#ifndef _PNG_HELPER
-#define _PNG_HELPER
+#ifndef _GNAIVEBAYES
+#define _GNAIVEBAYES
 
-#include <iostream>
-#include <cstring>
-#include <cmath>
-//#include <png.h>
+#include "Backend/Database/GTable.h"
+#include "GMath/OHE.h"
+#include <stdio.h>
+#include <vector>
+#include <map>
 
-namespace shmea
+namespace glades {
+
+class NaiveBayes
 {
+private:
 
-class Image;
+	// <class id, class probility> <C, P(C)>
+	std::map<int, double> classes;
 
-class PNGHelper
-{
+	// <class id, <attribute id, probability> > <C, <x, P(x|C)> >
+	std::map<int, std::map<int, double> > attributesPerClass;
+
+	std::vector<OHE> OHEMaps;
 
 public:
-    /*static void applyRainbowFilter(png_bytep, png_bytep, png_uint_32, png_byte);
 
-    static void readImage(const char* inputPath, png_structp& png, png_infop& info, png_bytep*& rowPointers, png_uint_32& width, png_uint_32& height, png_byte& bitDepth, png_byte& colorType);
-    static void writeImage(const char* outputPath, png_structp png, png_infop info, png_bytep* rowPointers, png_uint_32 width, png_uint_32 height, png_byte bitDepth, png_byte colorType);*/
+	NaiveBayes()
+	{
+		//
+	}
 
-    static void applyRainbowFilter(Image&, unsigned int);
-
-    static void pngTest(const char*, const char*);
-    static void LoadPNG(Image&, const char*);
-    static void LoadPNG(Image&, const unsigned char*, unsigned int, unsigned int);
-
+	shmea::GTable import(const shmea::GTable&);
+	shmea::GTable import2(const shmea::GTable&);
+	void train(const shmea::GTable&);
+	int predict(const shmea::GList&);
+	void print() const;
+	void reset();
 };
-
 };
 
 #endif

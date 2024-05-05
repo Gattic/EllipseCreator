@@ -41,7 +41,6 @@ class Connection;
 
 namespace glades {
 
-class DataInput;
 class NNInfo;
 class Layer;
 class Node;
@@ -58,7 +57,6 @@ private:
 	friend RNN;
 	friend MetaNetwork;
 
-	DataInput* di;
 	NNInfo* skeleton;
 	LayerBuilder* meat;
 	CMatrix* confusionMatrix;
@@ -80,19 +78,33 @@ private:
 	int minibatchSize;
 	int64_t id;
 
-	bool firstRunActivation;
-
 	// for tables & graphs
 	shmea::GList learningCurve;
 	std::vector<Point2*> rocCurve;
 	shmea::GList results;
 	shmea::GTable nbRecord;
-	//Only for sending on the network
-	shmea::GList cNodeActivations;
 
-	void SGDHelper(unsigned int, int); // Stochastic Gradient Descent
+	void SGDHelper(unsigned int, int, int); // Stochastic Gradient Descent
 
-	void ForwardPass(unsigned int, int, int, unsigned int, unsigned int);
+	virtual void beforeFwdEdge(const NetworkState*);
+	virtual void beforeFwdNode(const NetworkState*);
+	virtual void beforeFwdLayer(const NetworkState*);
+	virtual void beforeFwd();
+	virtual void beforeBackEdge(const NetworkState*);
+	virtual void beforeBackNode(const NetworkState*);
+	virtual void beforeBackLayer(const NetworkState*);
+	virtual void beforeBack();
+
+	virtual void afterFwdEdge(const NetworkState*);
+	virtual void afterFwdNode(const NetworkState*, float = 0.0f);
+	virtual void afterFwdLayer(const NetworkState*, float = 0.0f);
+	virtual void afterFwd();
+	virtual void afterBackEdge(const NetworkState*);
+	virtual void afterBackNode(const NetworkState*);
+	virtual void afterBackLayer(const NetworkState*);
+	virtual void afterBack();
+
+	void ForwardPass(unsigned int, int, int, int, unsigned int, unsigned int);
 	void BackPropagation(unsigned int, int, int, unsigned int, unsigned int);
 
 public:
@@ -111,15 +123,15 @@ public:
 	void stop();
 
 	// Database
-	bool load(const shmea::GString&);
+	bool load(const std::string&);
 	bool save() const;
 	void setServer(GNet::GServer*, GNet::Connection*);
 
 	// Stochastic Gradient Descent
-	void run(DataInput*, const Terminator*, int);
+	void run(const shmea::GTable&, const Terminator*, int);
 
 	int64_t getID() const;
-	shmea::GString getName() const;
+	std::string getName() const;
 	NNInfo* getNNInfo();
 	float getAccuracy() const;
 

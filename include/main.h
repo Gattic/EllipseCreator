@@ -14,36 +14,11 @@
 // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#ifndef _PNG_HELPER
-#define _PNG_HELPER
+#ifndef _GLADES_MAIN
+#define _GLADES_MAIN
 
-#include <iostream>
-#include <cstring>
-#include <cmath>
-//#include <png.h>
+//#include "core/version.h"
 
-namespace shmea
-{
-
-class Image;
-
-class PNGHelper
-{
-
-public:
-    /*static void applyRainbowFilter(png_bytep, png_bytep, png_uint_32, png_byte);
-
-    static void readImage(const char* inputPath, png_structp& png, png_infop& info, png_bytep*& rowPointers, png_uint_32& width, png_uint_32& height, png_byte& bitDepth, png_byte& colorType);
-    static void writeImage(const char* outputPath, png_structp png, png_infop info, png_bytep* rowPointers, png_uint_32 width, png_uint_32 height, png_byte bitDepth, png_byte colorType);*/
-
-    static void applyRainbowFilter(Image&, unsigned int);
-
-    static void pngTest(const char*, const char*);
-    static void LoadPNG(Image&, const char*);
-    static void LoadPNG(Image&, const unsigned char*, unsigned int, unsigned int);
-
-};
-
-};
+// extern Version version;
 
 #endif

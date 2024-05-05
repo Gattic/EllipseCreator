@@ -70,41 +70,41 @@ class NNInfo;
 
 class EllipseCreatorPanel : public GPanel {
 protected:
-  virtual void updateFromQ(const shmea::ServiceData*);
+  virtual void updateFromQ(const shmea::ServiceData *);
   virtual void onStart();
 
   GNet::GServer *serverInstance;
   bool keepGraping;
 
-  int64_t parsePct(const shmea::GType&);
+  int64_t parsePct(const shmea::GType &);
 
   void buildPanel();
-  RUGraph* dotGraph;
-  RULabel* lblmode;
+  RUGraph *dotGraph;
+  RULabel *lblmode;
   bool clickMode;
   bool pointTypeFlag;
-  Point2* cFocalPoint;
-  Ellipse* initEllipse;
+  Point2 *cFocalPoint;
+  Ellipse *initEllipse;
 
-  std::map<int, Circle*> circles;
+  std::map<int, Circle *> circles;
 
 public:
   static const int MODE_CIRCLES = 0;
   static const int MODE_ELLIPSES = 1;
 
-  static const int TYPE_FOCAL_POINT  = 0;
+  static const int TYPE_FOCAL_POINT = 0;
   static const int TYPE_RADIUS = 1;
 
-  EllipseCreatorPanel(const shmea::GString&, int, int);
-  EllipseCreatorPanel(GNet::GServer*, const shmea::GString&, int, int);
+  EllipseCreatorPanel(const shmea::GString &, int, int);
+  EllipseCreatorPanel(GNet::GServer *, const shmea::GString &, int, int);
   virtual ~EllipseCreatorPanel();
 
-  void clearCircleHelper(const shmea::GString&, int, int);
-  void toggleModeHelper(const shmea::GString&, int, int);
-  void addCircle(const Point2*, double);
-  void addEllipse(const Point2*, double);
+  void clearCircleHelper(const shmea::GString &, int, int);
+  void toggleModeHelper(const shmea::GString &, int, int);
+  void addCircle(const Point2 *, double);
+  void addEllipse(const Point2 *, double);
 
-  void onMouseDown(const shmea::GString&, int, int);
+  void onMouseDown(const shmea::GString &, int, int);
 };
 
 #endif

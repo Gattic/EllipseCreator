@@ -14,36 +14,57 @@
 // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#ifndef _PNG_HELPER
-#define _PNG_HELPER
+#ifndef _GMETANETWORK
+#define _GMETANETWORK
 
-#include <iostream>
-#include <cstring>
-#include <cmath>
-//#include <png.h>
+#include "State/Terminator.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string>
+#include <vector>
 
-namespace shmea
+namespace glades {
+
+class NNInfo;
+class NNetwork;
+
+class MetaNetwork
 {
+private:
+	const static int ONE_TO_ONE = 0;
+	const static int ONE_TO_MANY = 1;
 
-class Image;
-
-class PNGHelper
-{
+	std::string name;
+	int collectionType;
+	std::vector<NNetwork*> subnets;
 
 public:
-    /*static void applyRainbowFilter(png_bytep, png_bytep, png_uint_32, png_byte);
+	MetaNetwork(std::string);
+	MetaNetwork(NNInfo*, int = 1);
+	MetaNetwork(std::string metaNetName, std::string nname, int = 1);
+	virtual ~MetaNetwork();
 
-    static void readImage(const char* inputPath, png_structp& png, png_infop& info, png_bytep*& rowPointers, png_uint_32& width, png_uint_32& height, png_byte& bitDepth, png_byte& colorType);
-    static void writeImage(const char* outputPath, png_structp png, png_infop info, png_bytep* rowPointers, png_uint_32 width, png_uint_32 height, png_byte bitDepth, png_byte colorType);*/
+	// manipulations/functions
+	void clearSubnets();
 
-    static void applyRainbowFilter(Image&, unsigned int);
+	// sets
+	void setName(std::string);
+	void addSubnet(NNInfo*);
+	void addSubnet(NNetwork*);
+	void addSubnet(const std::string nNetName);
 
-    static void pngTest(const char*, const char*);
-    static void LoadPNG(Image&, const char*);
-    static void LoadPNG(Image&, const unsigned char*, unsigned int, unsigned int);
+	// gets
+	std::string getName() const;
+	int size() const;
+	std::vector<NNetwork*> getSubnets() const;
+	NNetwork* getSubnet(unsigned int);
+	std::string getSubnetName(unsigned int) const;
+	NNetwork* getSubnetByName(std::string) const;
 
+	// verification functions
+	void crossValidate(std::string fNames, Terminator* Arnold);
 };
-
 };
 
 #endif

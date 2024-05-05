@@ -25,6 +25,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 #include "ellipsecreator.h"
+#include "Frontend/GFXUtilities/Circle.h"
+#include "Frontend/GFXUtilities/Ellipse.h"
 #include "Frontend/GItems/GItem.h"
 #include "Frontend/GLayouts/GLinearLayout.h"
 #include "Frontend/GUI/RUCheckbox.h"
@@ -37,10 +39,8 @@
 #include "Frontend/GUI/Text/RULabel.h"
 #include "Frontend/GUI/Text/RUTextbox.h"
 #include "Frontend/Graphics/graphics.h"
-#include "Frontend/RUGraph/RUGraph.h"
 #include "Frontend/RUGraph/Graphable.h"
-#include "Frontend/GFXUtilities/Circle.h"
-#include "Frontend/GFXUtilities/Ellipse.h"
+#include "Frontend/RUGraph/RUGraph.h"
 #include "crt0.h"
 #include "main.h"
 #include "services/gui_callback.h"
@@ -57,8 +57,7 @@ using namespace glades;
  */
 EllipseCreatorPanel::EllipseCreatorPanel(const shmea::GString &name, int width,
                                          int height)
-    : GPanel(name, width, height) 
-{
+    : GPanel(name, width, height) {
   keepGraping = true;
   clickMode = MODE_CIRCLES;
   pointTypeFlag = TYPE_FOCAL_POINT;
@@ -70,8 +69,7 @@ EllipseCreatorPanel::EllipseCreatorPanel(const shmea::GString &name, int width,
 EllipseCreatorPanel::EllipseCreatorPanel(GNet::GServer *newInstance,
                                          const shmea::GString &name, int width,
                                          int height)
-    : GPanel(name, width, height) 
-{
+    : GPanel(name, width, height) {
   keepGraping = true;
   clickMode = MODE_CIRCLES;
   pointTypeFlag = TYPE_FOCAL_POINT;
@@ -80,224 +78,200 @@ EllipseCreatorPanel::EllipseCreatorPanel(GNet::GServer *newInstance,
   buildPanel();
 }
 
-void EllipseCreatorPanel::buildPanel() 
-{
+void EllipseCreatorPanel::buildPanel() {
 
-	// Setup the gfx env
-	int width=getWidth();
-	int height=getHeight();
+  // Setup the gfx env
+  int width = getWidth();
+  int height = getHeight();
 
-		int newTextColor=2;
-		SDL_Color newBGColor={0xAA, 0xAA, 0xAA, 0xFF};
-		
+  int newTextColor = 2;
+  SDL_Color newBGColor = {0xAA, 0xAA, 0xAA, 0xFF};
 
-		GLinearLayout* mainLayout = new GLinearLayout("EllipseCreatorPanel");
-		mainLayout->setOrientation(GLinearLayout::VERTICAL);
-		mainLayout->setX(0);
-		mainLayout->setY(0);
-		addSubItem(mainLayout);
+  GLinearLayout *mainLayout = new GLinearLayout("EllipseCreatorPanel");
+  mainLayout->setOrientation(GLinearLayout::VERTICAL);
+  mainLayout->setX(0);
+  mainLayout->setY(0);
+  addSubItem(mainLayout);
 
-		dotGraph = new RUGraph(width/2.0f, height/2.0f);
-		dotGraph->setVisible(true);
-		dotGraph->setDotMatrixEnabled(true);
-		dotGraph->setName("dotGraph");
-		dotGraph->setMouseDownListener(GeneralListener(this, &EllipseCreatorPanel::onMouseDown));
-		mainLayout->addSubItem(dotGraph);
+  dotGraph = new RUGraph(width / 2.0f, height / 2.0f);
+  dotGraph->setVisible(true);
+  dotGraph->setDotMatrixEnabled(true);
+  dotGraph->setName("dotGraph");
+  dotGraph->setMouseDownListener(
+      GeneralListener(this, &EllipseCreatorPanel::onMouseDown));
+  mainLayout->addSubItem(dotGraph);
 
-		// Instructions
-		lblmode = new RULabel();
-		lblmode->setWidth(200);
-		lblmode->setHeight(40);
-		lblmode->setText("Mode: Circles");
-		lblmode->setName("lblmode");
-		lblmode->setFontColor(newTextColor);
-		lblmode->setVisible(true);
+  // Instructions
+  lblmode = new RULabel();
+  lblmode->setWidth(200);
+  lblmode->setHeight(40);
+  lblmode->setText("Mode: Circles");
+  lblmode->setName("lblmode");
+  lblmode->setFontColor(newTextColor);
+  lblmode->setVisible(true);
 
-		mainLayout->addSubItem(lblmode);
-		// Instructions
-		RULabel* lblhelp1 = new RULabel();
-		lblhelp1->setWidth(800);
-		lblhelp1->setHeight(40);
-		lblhelp1->setBGColor(newBGColor);
-		lblhelp1->setText("Click once to set a focal point, once more to set a radius.");
-		lblhelp1->setName("lblhelp1");
-		lblhelp1->setFontColor(newTextColor);
-		lblhelp1->setVisible(true);
-		mainLayout->addSubItem(lblhelp1);
+  mainLayout->addSubItem(lblmode);
+  // Instructions
+  RULabel *lblhelp1 = new RULabel();
+  lblhelp1->setWidth(800);
+  lblhelp1->setHeight(40);
+  lblhelp1->setBGColor(newBGColor);
+  lblhelp1->setText(
+      "Click once to set a focal point, once more to set a radius.");
+  lblhelp1->setName("lblhelp1");
+  lblhelp1->setFontColor(newTextColor);
+  lblhelp1->setVisible(true);
+  mainLayout->addSubItem(lblhelp1);
 
-		RULabel* lblhelp2 = new RULabel();
-		lblhelp2->setWidth(800);
-		lblhelp2->setHeight(40);
-		lblhelp2->setBGColor(newBGColor);
-		lblhelp2->setText("For Ellipse mode, any subsequent clicks add foci.");
-		lblhelp2->setName("lblhelp2");
-		lblhelp2->setFontColor(newTextColor);
-		lblhelp2->setVisible(true);
-		mainLayout->addSubItem(lblhelp2);
+  RULabel *lblhelp2 = new RULabel();
+  lblhelp2->setWidth(800);
+  lblhelp2->setHeight(40);
+  lblhelp2->setBGColor(newBGColor);
+  lblhelp2->setText("For Ellipse mode, any subsequent clicks add foci.");
+  lblhelp2->setName("lblhelp2");
+  lblhelp2->setFontColor(newTextColor);
+  lblhelp2->setVisible(true);
+  mainLayout->addSubItem(lblhelp2);
 
-		// Clear all circles button
-		RUButton* btnclear = new RUButton();
-		btnclear->setWidth(200);
-		btnclear->setHeight(40);
-		btnclear->setX(width - btnclear->getWidth() - 6);
-		btnclear->setY(height - btnclear->getHeight() - 6);
-		btnclear->setName("btnclear");
-		btnclear->setText("  Clear Circles");
-		btnclear->setFontColor(newTextColor);
-		btnclear->setVisible(true);
-		btnclear->setMouseDownListener(GeneralListener(this, &EllipseCreatorPanel::clearCircleHelper));
-		addSubItem(btnclear);
+  // Clear all circles button
+  RUButton *btnclear = new RUButton();
+  btnclear->setWidth(200);
+  btnclear->setHeight(40);
+  btnclear->setX(width - btnclear->getWidth() - 6);
+  btnclear->setY(height - btnclear->getHeight() - 6);
+  btnclear->setName("btnclear");
+  btnclear->setText("  Clear Circles");
+  btnclear->setFontColor(newTextColor);
+  btnclear->setVisible(true);
+  btnclear->setMouseDownListener(
+      GeneralListener(this, &EllipseCreatorPanel::clearCircleHelper));
+  addSubItem(btnclear);
 
-		// Toggle graph mode
-		RUButton* btnmode = new RUButton();
-		btnmode->setWidth(200);
-		btnmode->setHeight(40);
-		btnmode->setX(width - btnmode->getWidth() - btnclear->getWidth() - 12);
-		btnmode->setY(height - btnmode->getHeight() - 6);
-		btnmode->setName("btnmode");
-		btnmode->setText("  Toggle Mode");
-		btnmode->setFontColor(newTextColor);
-		btnmode->setVisible(true);
-		btnmode->setMouseDownListener(GeneralListener(this, &EllipseCreatorPanel::toggleModeHelper));
-		addSubItem(btnmode);
+  // Toggle graph mode
+  RUButton *btnmode = new RUButton();
+  btnmode->setWidth(200);
+  btnmode->setHeight(40);
+  btnmode->setX(width - btnmode->getWidth() - btnclear->getWidth() - 12);
+  btnmode->setY(height - btnmode->getHeight() - 6);
+  btnmode->setName("btnmode");
+  btnmode->setText("  Toggle Mode");
+  btnmode->setFontColor(newTextColor);
+  btnmode->setVisible(true);
+  btnmode->setMouseDownListener(
+      GeneralListener(this, &EllipseCreatorPanel::toggleModeHelper));
+  addSubItem(btnmode);
 }
 
+void EllipseCreatorPanel::clearCircleHelper(const shmea::GString &label, int x,
+                                            int y) {
+  if (dotGraph)
+    dotGraph->clear(true);
 
-void EllipseCreatorPanel::clearCircleHelper(const shmea::GString& label, int x, int y) 
-{
-    if (dotGraph)
-	dotGraph->clear(true);
-    
-    circles.clear();
+  circles.clear();
 
-
-    if(cFocalPoint)
-	delete cFocalPoint;
-    cFocalPoint = NULL;
-    initEllipse = NULL;
-
+  if (cFocalPoint)
+    delete cFocalPoint;
+  cFocalPoint = NULL;
+  initEllipse = NULL;
 }
 
-void EllipseCreatorPanel::toggleModeHelper(const shmea::GString& label, int eventX, int eventY)
-{
-    clickMode = !clickMode;
+void EllipseCreatorPanel::toggleModeHelper(const shmea::GString &label,
+                                           int eventX, int eventY) {
+  clickMode = !clickMode;
 
-    if (dotGraph && lblmode) 
-    {
-	if(clickMode == MODE_CIRCLES)
-	{
-	    lblmode->setText("Mode: Circles");
-	} else if (clickMode == MODE_ELLIPSES)
-	{
-	    lblmode->setText("Mode: Ellipses");
-	}
+  if (dotGraph && lblmode) {
+    if (clickMode == MODE_CIRCLES) {
+      lblmode->setText("Mode: Circles");
+    } else if (clickMode == MODE_ELLIPSES) {
+      lblmode->setText("Mode: Ellipses");
     }
+  }
 }
 
-void EllipseCreatorPanel::addCircle(const Point2* focalPoint, double radius) 
-{
+void EllipseCreatorPanel::addCircle(const Point2 *focalPoint, double radius) {
 
-    SDL_Color newCircleColor = {0x00, 0x00, 0xFF, 0xFF};
-    Circle* newCircle = new Circle();
-    newCircle->setCenter(focalPoint);
-    newCircle->setRadius(radius);
+  SDL_Color newCircleColor = {0x00, 0x00, 0xFF, 0xFF};
+  Circle *newCircle = new Circle();
+  newCircle->setCenter(focalPoint);
+  newCircle->setRadius(radius);
 
-    
-    if(newCircle)
-	dotGraph->add("circle", newCircle, newCircleColor);
-    circles.insert(std::pair<int, Circle*>(dotGraph->getGraphSize()-1, newCircle));
+  if (newCircle)
+    dotGraph->add("circle", newCircle, newCircleColor);
+  circles.insert(
+      std::pair<int, Circle *>(dotGraph->getGraphSize() - 1, newCircle));
 
-    EllipseCreatorPanel::addEllipse(focalPoint, radius);
-
+  EllipseCreatorPanel::addEllipse(focalPoint, radius);
 }
 
-void EllipseCreatorPanel::addEllipse(const Point2* focalPoint, double radius)
-{
+void EllipseCreatorPanel::addEllipse(const Point2 *focalPoint, double radius) {
 
-    SDL_Color newEllipseColor = {0x00, 0x00, 0xFF, 0xFF};
-    initEllipse = new Ellipse();
-    initEllipse->addFocalPoint(focalPoint);
-    initEllipse->setRadius(radius);
-    
+  SDL_Color newEllipseColor = {0x00, 0x00, 0xFF, 0xFF};
+  initEllipse = new Ellipse();
+  initEllipse->addFocalPoint(focalPoint);
+  initEllipse->setRadius(radius);
 }
 
-void EllipseCreatorPanel::onMouseDown(const shmea::GString& label, int eventX, int eventY) 
-{
-    if(clickMode == MODE_CIRCLES)
-    {
-	if (pointTypeFlag == TYPE_RADIUS) 
-	{
-	    if(!cFocalPoint)
-		return;
-	    //Radius
-	    double radius = sqrt(pow(cFocalPoint->getX() - ((double)eventX), 2.0f) + pow(cFocalPoint->getY() - ((double)eventY), 2.0f));
-	    EllipseCreatorPanel::addCircle(cFocalPoint, radius);
+void EllipseCreatorPanel::onMouseDown(const shmea::GString &label, int eventX,
+                                      int eventY) {
+  if (clickMode == MODE_CIRCLES) {
+    if (pointTypeFlag == TYPE_RADIUS) {
+      if (!cFocalPoint)
+        return;
+      // Radius
+      double radius = sqrt(pow(cFocalPoint->getX() - ((double)eventX), 2.0f) +
+                           pow(cFocalPoint->getY() - ((double)eventY), 2.0f));
+      EllipseCreatorPanel::addCircle(cFocalPoint, radius);
 
-	    if(cFocalPoint)
-		delete cFocalPoint;
-	    cFocalPoint = NULL;
+      if (cFocalPoint)
+        delete cFocalPoint;
+      cFocalPoint = NULL;
 
-	}
-	else if (pointTypeFlag == TYPE_FOCAL_POINT) 
-	{
-	    //Focal Point
-	    cFocalPoint = new Point2(eventX, eventY);
-	}
+    } else if (pointTypeFlag == TYPE_FOCAL_POINT) {
+      // Focal Point
+      cFocalPoint = new Point2(eventX, eventY);
+    }
 
-	pointTypeFlag = !pointTypeFlag;
-    } else if(clickMode == MODE_ELLIPSES)
-    {
-	if (pointTypeFlag == TYPE_RADIUS) 
-	{
-	    if(!cFocalPoint)
-		return;
-	    //Radius
-	    double radius = sqrt(pow(cFocalPoint->getX() - ((double)eventX), 2.0f) + pow(cFocalPoint->getY() - ((double)eventY), 2.0f));
-	    SDL_Color circleColor = RUColors::DEFAULT_COLOR_LINE;
-	    EllipseCreatorPanel::addCircle(cFocalPoint, radius);
-//	    dotGraph->add("circle", new Point2(cFocalPoint->getX(), cFocalPoint->getY()), circleColor);
+    pointTypeFlag = !pointTypeFlag;
+  } else if (clickMode == MODE_ELLIPSES) {
+    if (pointTypeFlag == TYPE_RADIUS) {
+      if (!cFocalPoint)
+        return;
+      // Radius
+      double radius = sqrt(pow(cFocalPoint->getX() - ((double)eventX), 2.0f) +
+                           pow(cFocalPoint->getY() - ((double)eventY), 2.0f));
+      SDL_Color circleColor = RUColors::DEFAULT_COLOR_LINE;
+      EllipseCreatorPanel::addCircle(cFocalPoint, radius);
+      //	    dotGraph->add("circle", new Point2(cFocalPoint->getX(),
+      //cFocalPoint->getY()), circleColor);
 
-	    if(cFocalPoint)
-		delete cFocalPoint;
-	    cFocalPoint = NULL;
-	    //Switch the type of point we are waiting for
-	    pointTypeFlag = !pointTypeFlag;
+      if (cFocalPoint)
+        delete cFocalPoint;
+      cFocalPoint = NULL;
+      // Switch the type of point we are waiting for
+      pointTypeFlag = !pointTypeFlag;
 
-	} else if (pointTypeFlag == TYPE_FOCAL_POINT) 
-	{
-	    //Focal Point
-	    cFocalPoint = new Point2(eventX, eventY);
+    } else if (pointTypeFlag == TYPE_FOCAL_POINT) {
+      // Focal Point
+      cFocalPoint = new Point2(eventX, eventY);
 
-	    if(circles.size() == 0)
-		    pointTypeFlag = !pointTypeFlag;
-	    else 
-	    {
-		if(initEllipse)
-		{
-		    initEllipse->addFocalPoint(cFocalPoint);
-		    dotGraph->add("ellipse", initEllipse, RUColors::DEFAULT_COLOR_LINE);
-		}
+      if (circles.size() == 0)
+        pointTypeFlag = !pointTypeFlag;
+      else {
+        if (initEllipse) {
+          initEllipse->addFocalPoint(cFocalPoint);
+          dotGraph->add("ellipse", initEllipse, RUColors::DEFAULT_COLOR_LINE);
+        }
 
-		if(cFocalPoint)
-		    delete cFocalPoint;
-		cFocalPoint = NULL;
-
-	    }
-
-	}
-    }   
+        if (cFocalPoint)
+          delete cFocalPoint;
+        cFocalPoint = NULL;
+      }
+    }
+  }
 }
 
-EllipseCreatorPanel::~EllipseCreatorPanel() 
-{
+EllipseCreatorPanel::~EllipseCreatorPanel() {}
 
-}
+void EllipseCreatorPanel::updateFromQ(const shmea::ServiceData *data) {}
 
-void EllipseCreatorPanel::updateFromQ(const shmea::ServiceData* data) 
-{
-	
-}
-
-void EllipseCreatorPanel::onStart()
-{
-}
+void EllipseCreatorPanel::onStart() {}
