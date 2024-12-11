@@ -26,7 +26,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 #Project
 project(EllipseCreator)
 set(G_VERSION_MAJOR 0)
-set(G_VERSION_MINOR 57)
+set(G_VERSION_MINOR 58)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
