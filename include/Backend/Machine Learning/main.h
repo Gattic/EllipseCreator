@@ -14,46 +14,50 @@
 // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#ifndef _GML_RNN
-#define _GML_RNN
+#ifndef _GLADESML
+#define _GLADESML
 
-#include "network.h"
+#include <algorithm>
+#include <map>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <sys/signal.h>
+#include <sys/stat.h>
 #include <vector>
 
-namespace glades {
-
-class NNInfo;
-class NetworkState;
-
-class RNN : public NNetwork
-{
-private:
-	virtual void beforeFwdEdge(const NetworkState*);
-	virtual void beforeFwdNode(const NetworkState*);
-	virtual void beforeFwdLayer(const NetworkState*);
-	virtual void beforeFwd();
-	virtual void beforeBackEdge(const NetworkState*);
-	virtual void beforeBackNode(const NetworkState*);
-	virtual void beforeBackLayer(const NetworkState*);
-	virtual void beforeBack();
-
-	virtual void afterFwdEdge(const NetworkState*);
-	virtual void afterFwdNode(const NetworkState*, float = 0.0f);
-	virtual void afterFwdLayer(const NetworkState*, float = 0.0f);
-	virtual void afterFwd();
-	virtual void afterBackEdge(const NetworkState*);
-	virtual void afterBackNode(const NetworkState*);
-	virtual void afterBackLayer(const NetworkState*);
-	virtual void afterBack();
-
-public:
-	RNN();
-	~RNN();
+namespace GNet {
+class GServer;
+class Connection;
 };
+
+namespace glades {
+class NNInfo;
+class MetaNetwork;
+class NNetwork;
+class RNN;
+class Layer;
+class DataInput;
+
+void init();
+RNN* getRNN(const std::string&);
+bool saveNeuralNetwork(NNetwork*);
+
+// Machine Learning Functions
+MetaNetwork* train(NNInfo*, DataInput*, GNet::GServer* = NULL, GNet::Connection* = NULL);
+MetaNetwork* train(NNetwork*, DataInput*, GNet::GServer* = NULL, GNet::Connection* = NULL);
+MetaNetwork* train(MetaNetwork*, DataInput*, GNet::GServer* = NULL, GNet::Connection* = NULL);
+MetaNetwork* test(NNInfo*, DataInput*, GNet::GServer* = NULL, GNet::Connection* = NULL);
+MetaNetwork* test(NNetwork*, DataInput*, GNet::GServer* = NULL, GNet::Connection* = NULL);
+MetaNetwork* test(MetaNetwork*, DataInput*, GNet::GServer* = NULL, GNet::Connection* = NULL);
+MetaNetwork* crossValidate(NNInfo*, std::string, bool, int, GNet::GServer* = NULL, GNet::Connection* = NULL);
+MetaNetwork* crossValidate(std::string, std::vector<std::string>, float, bool, int, GNet::GServer* = NULL, GNet::Connection* = NULL);
+
+// Database Setup
+bool doesDatabaseExist();
+void createDatabase();
 };
 
 #endif

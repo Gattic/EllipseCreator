@@ -242,7 +242,7 @@ void EllipseCreatorPanel::onMouseDown(const shmea::GString &label, int eventX,
       SDL_Color circleColor = RUColors::DEFAULT_COLOR_LINE;
       EllipseCreatorPanel::addCircle(cFocalPoint, radius);
       //	    dotGraph->add("circle", new Point2(cFocalPoint->getX(),
-      //cFocalPoint->getY()), circleColor);
+      // cFocalPoint->getY()), circleColor);
 
       if (cFocalPoint)
         delete cFocalPoint;
